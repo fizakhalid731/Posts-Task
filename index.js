@@ -295,3 +295,28 @@ app.delete('/deletemycomment/:username',authenticate,(req, res)=>{
     
    return res.status(200).json({message: 'Delete your comment'})
 });
+
+app.post('/addlikes/:postId/:like',authenticate,(req, res)=>{
+    const loggeduser =req.user.username;
+    const {postId,like} = req.params;
+
+   if(!like){
+   return res.status(400).json({message: "Like is required"})
+   }
+
+   const checkUserId = post.find(post => post.user_id === parseInt(postId));
+
+   if(!checkUserId){
+    return res.status(404).json({message: "not post found"})
+   }
+   if(loggeduser === checkUserId.username){
+    return res.status(400).json({message: "You have not permission to like post"})
+   }
+   const userlikes = post.filter(likes => likes.username === loggeduser);
+    if(userlikes){
+        const addlike = like;
+        checkUserId.likes.push(`${loggeduser} like this post ${addlike}`);
+    }
+    
+    return res.status(200).json(post)
+});
